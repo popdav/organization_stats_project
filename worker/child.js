@@ -3,9 +3,14 @@ const {spawn} = require('child_process');
 
 class Child {
     constructor(file) {
+        try{
         let rawdata = fs.readFileSync(file);
         this.organizations = JSON.parse(rawdata);
         this.organizationIndex = 0;
+        }
+        catch(err) {
+            throw err;
+        }
     }
 
     getNextOrganisation = () => {
