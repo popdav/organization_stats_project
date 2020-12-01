@@ -1,32 +1,23 @@
 const io = require('socket.io')();
-const fs = require('fs');
-const {spawn} = require('child_process');
+const Child = require('./child')
 
-let rawdata = fs.readFileSync('config.json');
-let organizations = JSON.parse(rawdata);
-let organizationIndex = 0;
-
+const cp = new Child('config.json');
 
 io.on('connection', client => { 
     console.log('new client');
-    client.emit('work', organizations[organizationIndex++]);
+    client.on('getorg', () => {    
+        client.emit('work', cp.getNextOrganisation());
+    })
+
+    client.on('isLive', () => {
+        client.emit('yesLive', {'live': true});
+    })
+
 });
 
-console.log('socket.io server working on: http://localhost:3000')
 io.listen(3000);
 
-for (let i=0; i<organizations.length; i++) {
-    let child = spawn('node', ['./worker_instance/index.js'])
+console.log('socket.io server working on: http://localhost:3000')
 
-    child.stdout.on('data', function (data) {
-        console.log('child'+i+' stdout: ' + data.toString());
-    });
-      
-    child.stderr.on('data', function (data) {
-        console.log('child'+i+' stderr: ' + data.toString());
-    });
-    
-    child.on('exit', function (code) {
-        console.log('child'+i+' process exited with code ' + code.toString());
-    });
-}
+setTimeout(cp.startChildProcess, 1000);
+

@@ -1,13 +1,18 @@
 const axios = require('axios');
+const { Organization } = require('../db/organization');
 const projectModel = require('../db/projects').Project
 const organizationModel = require('../db/organization').Organization
 
 const pushToDb = async (projects, organization) => {
     try {
-        const arrProjects = await projectModel.insertMany(projects);
-        const org = await organizationModel.create(organization);
+        await organizationModel.findOneAndUpdate({organizationId: organization.organizationId}, 
+                                                                organization, 
+                                                                {upsert: true, new: true});
 
-        return {arrProjects, org};
+        await projects.forEach(async (project) => {
+            await projectModel.findOneAndUpdate({projectId:project.projectId}, project, {upsert: true, new: true})
+        })
+
     }
     catch(err) {
         throw err;
