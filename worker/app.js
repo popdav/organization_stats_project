@@ -9,7 +9,7 @@ let organizationIndex = 0;
 
 io.on('connection', client => { 
     console.log('new client');
-    client.emit('work', organizations[organizationIndex++]) 
+    client.emit('work', organizations[organizationIndex++]);
 });
 
 console.log('socket.io server working on: http://localhost:3000')
