@@ -1,16 +1,16 @@
 const socket = require('socket.io-client')('http://localhost:3000');
 const axios = require('axios');
-const {getSessionToken} = require('../services/index')
-
-let sessionToken = ''
+const {getData} = require('../services/index')
+const fs = require('fs');
 
 socket.on('connect', () => {console.log('connected to server')});
 
 socket.on('work', async (data) => {
-    console.log(data)
     try {
-        let sessionToken = await getSessionToken(data.masterKey);
-        console.log(sessionToken)
+        let aggregatedData = await getData(data);
+        let aggregatedDataString = JSON.stringify(aggregatedData);
+        fs.writeFileSync('./object-' + aggregatedData.name + '.json', aggregatedDataString);
+        console.log("Got data!")
     }
     catch(err) {
         console.log(err);
