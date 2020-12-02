@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path');
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const logger = require('morgan');
@@ -22,6 +23,7 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+app.use(express.static(path.join(__dirname, '../client/public_build')));
 app.use('/', indexRouter);
 app.use('/', hearbeatRouter);
 
