@@ -1,5 +1,5 @@
 const { query } = require('express');
-const {getOrganizations, getProjects, getProjectsAggregation} = require('../db/query')
+const {getOrganizations, getProjects, getProjectsAggregation, getProjectsStats} = require('../db/query')
 
 const getAllOrganizations = async () => {
     try {
@@ -15,6 +15,16 @@ const getAllProjects = async (body) => {
     try {
         let {query, paging} = buildQuery(body);
         return await getProjects(query, paging);
+    }
+    catch(err) {
+        throw err;
+    }
+}
+
+const getAllProjectsStats = async (body) => {
+    try {
+        let {query, paging} = buildQuery(body);
+        return await getProjectsStats(query);
     }
     catch(err) {
         throw err;
@@ -62,6 +72,28 @@ const getAvgProcessingTime = async (body) => {
                               { "$ifNull": [ "$submittedAt", 0 ] }
                             ]
                           }}
+                    }
+            }
+          ]
+        return await getProjectsAggregation(avgQuery);
+    }
+    catch(err) {
+        throw err;
+    }
+}
+
+const getProjectCountForEachPackage = async (body) => {
+    try {
+        let {query, paging} = buildQuery(body);
+        let avgQuery = [
+            {
+                $match: query,
+            },
+            {
+                $group:
+                    {
+                        _id: "$package",
+                        "count": { "$sum": 1 }
                     }
             }
           ]
@@ -162,4 +194,7 @@ module.exports = {
     getAvgSmartTag, 
     getAvgProcessingTime, 
     getProjectCountForEachScanner, 
-    getTotalAreaScanned};
+    getTotalAreaScanned,
+    getProjectCountForEachPackage,
+    getAllProjectsStats
+};

@@ -22,6 +22,7 @@ class App extends React.Component {
       avgSmartTag: {},
       processingTime: {},
       projectCount: [],
+      projectCountPackage: [],
       totalArea: [],
       inteval: null,
       heartbeat: {live: false},
@@ -34,13 +35,17 @@ class App extends React.Component {
     try {
 
       let res = await axios.post('/projects', this.state.searchBody);
-      console.log(res.data); 
+      console.log(res.data);
+      let stats = await axios.post('/projectsstats', this.state.searchBody);
+      console.log(stats.data);  
       let avg = await axios.post('/smarttag', this.state.searchBody);
       console.log(avg)
       let ptime = await axios.post('/processingtime', this.state.searchBody);
       console.log(ptime)
       let count = await axios.post('/projectcount', this.state.searchBody);
       console.log(count)
+      let countPckg = await axios.post('/projectcountpackage', this.state.searchBody);
+      console.log(countPckg)
       let area = await axios.post('/totalarea', this.state.searchBody);
       console.log(area)
       
@@ -54,7 +59,9 @@ class App extends React.Component {
         avgSmartTag: avg.data[0],
         processingTime: ptime.data[0],
         projectCount: count.data,
+        projectCountPackage: countPckg.data,
         totalArea: area.data,
+        stats: stats.data,
         heartbeat: heartbeat.data
       });
 
@@ -105,13 +112,17 @@ class App extends React.Component {
     try {
 
       let res = await axios.post('/projects', body);
-      console.log(res.data); 
+      console.log(res);
+      let stats = await axios.post('/projectsstats', body);
+      console.log(stats);  
       let avg = await axios.post('/smarttag', body);
       console.log(avg)
       let ptime = await axios.post('/processingtime', body);
       console.log(ptime)
       let count = await axios.post('/projectcount', body);
       console.log(count)
+      let countPckg = await axios.post('/projectcountpackage', body);
+      console.log(countPckg)
       let area = await axios.post('/totalarea', body);
       console.log(area)
       let heartbeat = await axios.get('/checkworker');
@@ -125,8 +136,10 @@ class App extends React.Component {
         avgSmartTag: avg.data[0],
         processingTime: ptime.data[0],
         projectCount: count.data,
+        projectCountPackage: countPckg.data,
         totalArea: area.data,
         heartbeat: heartbeat.data,
+        stats: stats.data,
         inteval: setInterval(this.refresh, this.state.refreshRate),
       });
 
@@ -206,6 +219,8 @@ class App extends React.Component {
       let res = await axios.get('/organizations');
       console.log(res.data);
       this.setState({organizations: res.data})
+      
+      this.handleClickSearch();
 
     }
     catch(err) {
@@ -248,7 +263,7 @@ class App extends React.Component {
           <div className="form-group">
             <label htmlFor="organizations">Select organization:</label>
             <select className="form-control" id="organizations" onChange={this.handleSelectOrganization}>
-              <option value=''></option>
+              <option value=''>All</option>
               {this.state.organizations.map((e, i) => {
                 return (
                   <option key={i} value={JSON.stringify(e)} >{e.organizationName}</option>
@@ -342,7 +357,13 @@ class App extends React.Component {
         {this.state.searchClicked ? (
           <div className='card'>
             <div>Page: {this.state.page}</div>
+            <div>Project count: {this.state.stats.all}</div>
             <div>Project count per page: {this.state.projects.length}</div>
+            <div>Deleted projects: {this.state.stats.deleted}</div>
+            <div>Completed projects: {this.state.stats.finished}</div>
+            <div>Not completed projects: {this.state.stats.unfinished}</div>
+            <div>Paid projects: {this.state.stats.paid}</div>
+            <div>Unpaid projects: {this.state.stats.unpaid}</div>
             <div>Average count of smartTags per project: {this.state.avgSmartTag ? this.state.avgSmartTag.avgSmartTag.toFixed(3) : 0}</div>
             <div>Average project processing time: {this.state.processingTime ? this.timeConversion(this.state.processingTime.avgProcessingTIme) : 0}</div>
             <br />
@@ -360,6 +381,15 @@ class App extends React.Component {
               {this.state.totalArea.map((e, i) => {
                 return (
                 <option key={i}>organization id: {e._id === null ? 'None' : e._id}, count: {e.count.toFixed(3)}</option>
+                )
+              })}
+            </select>
+            <br />
+            <div>Project count for each package:</div>
+            <select multiple disabled className="form-control" id="exampleFormControlSelect2">
+              {this.state.projectCountPackage.map((e, i) => {
+                return (
+                <option key={i}>package: {e._id === null ? 'None' : e._id}, count: {e.count}</option>
                 )
               })}
             </select>

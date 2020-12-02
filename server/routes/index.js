@@ -7,7 +7,9 @@ const {
     getAvgSmartTag, 
     getAvgProcessingTime, 
     getProjectCountForEachScanner,
-    getTotalAreaScanned
+    getTotalAreaScanned,
+    getProjectCountForEachPackage,
+    getAllProjectsStats
 } = require('../services/db_services');
 
 
@@ -37,7 +39,7 @@ router.get('/projects', async (req, res) => {
 
 router.post('/projects', async (req, res) => {
     let body = req.body;
-    console.log(body);
+    
     try {
         let proj = await getAllProjects(body);
         res.send(proj)
@@ -49,12 +51,26 @@ router.post('/projects', async (req, res) => {
     }
 })
 
+router.post('/projectsstats', async (req, res) => {
+    let body = req.body;
+    
+    try {
+        let proj = await getAllProjectsStats(body);
+        res.send(proj)
+    } 
+    catch(err) {
+        console.log(err)
+        res.status(500).send('error')
+       
+    }
+})
+
 router.post('/smarttag', async (req, res) => {
     let body = req.body;
-    console.log(body);
+    
     try {
         let avg = await getAvgSmartTag(body);
-        console.log(avg);
+        
         res.send(avg)
     } 
     catch(err) {
@@ -66,10 +82,10 @@ router.post('/smarttag', async (req, res) => {
 
 router.post('/processingtime', async (req, res) => {
     let body = req.body;
-    console.log(body);
+    
     try {
         let avg = await getAvgProcessingTime(body);
-        console.log(avg);
+        
         res.send(avg)
     } 
     catch(err) {
@@ -81,10 +97,25 @@ router.post('/processingtime', async (req, res) => {
 
 router.post('/projectcount', async (req, res) => {
     let body = req.body;
-    console.log(body);
+    
     try {
         let avg = await getProjectCountForEachScanner(body);
-        console.log(avg);
+        
+        res.send(avg)
+    } 
+    catch(err) {
+        console.log(err)
+        res.status(500).send('error')
+       
+    }
+})
+
+router.post('/projectcountpackage', async (req, res) => {
+    let body = req.body;
+    
+    try {
+        let avg = await getProjectCountForEachPackage(body);
+        
         res.send(avg)
     } 
     catch(err) {
@@ -96,10 +127,10 @@ router.post('/projectcount', async (req, res) => {
 
 router.post('/totalarea', async (req, res) => {
     let body = req.body;
-    console.log(body);
+    
     try {
         let avg = await getTotalAreaScanned(body);
-        console.log(avg);
+        
         res.send(avg)
     } 
     catch(err) {

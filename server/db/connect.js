@@ -35,12 +35,25 @@ class MongoDB {
 
     async aggregate(col, query) {
         try {
-            console.log(query)
+            
             let res = await this.db.collection(col).aggregate(query).toArray();
             return res;
         }
         catch(err) {
             console.log('MongoDB aggregation error:')
+            console.log(err);
+            return;
+        }
+    }
+
+    async count(col, query) {
+        try {
+            
+            let res = await this.db.collection(col).find(query).count();
+            return res;
+        }
+        catch(err) {
+            console.log('MongoDB count error:')
             console.log(err);
             return;
         }
