@@ -144,10 +144,10 @@ const buildQuery = (body) => {
     const firstDay = new Date(body.year, body.month, 1);
     const lastDay = new Date(body.year, body.month + 1, 0);
 
-    // query.updateAt = {
-    //     $lte: lastDay,
-    //     $gte: firstDay
-    // }
+    query.updatedAt = {
+        $lte: lastDay,
+        $gte: firstDay
+    }
 
     paging.limit = limit;
     paging.skip = (body.page - 1) * limit;
