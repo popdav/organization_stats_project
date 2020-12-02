@@ -31,6 +31,19 @@ class MongoDB {
             return;
         }
     }
+
+    async aggregate(col, query) {
+        try {
+            console.log(query)
+            let res = await this.db.collection(col).aggregate(query).toArray();
+            return res;
+        }
+        catch(err) {
+            console.log('MongoDB aggregation error:')
+            console.log(err);
+            return;
+        }
+    }
 }
 
 const mdb = new MongoDB();

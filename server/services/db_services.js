@@ -1,5 +1,5 @@
 const { query } = require('express');
-const {getOrganizations, getProjects, getOrganizationsPopulate} = require('../db/query')
+const {getOrganizations, getProjects, getProjectsAggregation} = require('../db/query')
 
 const getAllOrganizations = async () => {
     try {
@@ -14,8 +14,29 @@ const getAllOrganizations = async () => {
 const getAllProjects = async (body) => {
     try {
         let {query, paging} = buildQuery(body);
-        console.log(paging)
         return await getProjects(query, paging);
+    }
+    catch(err) {
+        throw err;
+    }
+}
+
+const getAvgSmartTag = async (body) => {
+    try {
+        let {query, paging} = buildQuery(body);
+        let avgQuery = [
+            {
+                $match: query,
+            },
+            {
+                $group:
+                    {
+                        _id: null,
+                        avgSmartTag: { $avg: "$smartTagsCount" }
+                    }
+            }
+          ]
+        return await getProjectsAggregation(avgQuery);
     }
     catch(err) {
         throw err;
@@ -53,4 +74,4 @@ const buildQuery = (body) => {
     return {query, paging};
 }
 
-module.exports = {getAllOrganizations, getAllProjects};
+module.exports = {getAllOrganizations, getAllProjects, getAvgSmartTag};

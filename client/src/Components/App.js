@@ -1,6 +1,7 @@
 import React from 'react'
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css';
+import Project from './Project';
 import axios from 'axios';
 
 class App extends React.Component {
@@ -8,11 +9,13 @@ class App extends React.Component {
     super(props);
     this.state = {
       organizations: [],
+      projects: [],
       selectedOrganization: '',
       projectsType: {all: true, finished: false, unfinished: false},
       projectsSub: {all: true, paid: false, unpaid: false},
       page: 1,
-      data: []
+      searchBody: {},
+      searchClicked: false,
     }
   }
 
@@ -38,7 +41,35 @@ class App extends React.Component {
       organizationName: this.state.selectedOrganization,
       projectsType: this.state.projectsType,
       projectsSub: this.state.projectsSub,
-      page: this.state.page
+      page: 1
+    }
+
+    console.log(body)
+    try {
+
+      let res = await axios.post('/projects', body);
+      console.log(res.data); 
+      this.setState({projects: res.data, searchBody: body, searchClicked: true, page: 1})
+      let avg = await axios.post('/smarttag', body);
+      console.log(avg)
+
+    }
+    catch(err) {
+      console.log(err);
+    }
+  };
+
+  handleClickPrevous = async () => {
+    if (this.state.page === 1) {
+      alert('You are on page 1');
+      return;
+    }
+
+    let body = {
+      organizationName: this.state.selectedOrganization,
+      projectsType: this.state.projectsType,
+      projectsSub: this.state.projectsSub,
+      page: this.state.page-1
     }
 
     console.log(body)
@@ -46,13 +77,50 @@ class App extends React.Component {
 
       let res = await axios.post('/projects', body);
       console.log(res.data);
-      // this.setState({organizations: res.data})
+      this.setState({
+        projects: res.data, 
+        searchBody: body, 
+        searchClicked: true, 
+        page: this.state.page-1
+      });
 
     }
     catch(err) {
       console.log(err);
     }
-  };
+  }
+
+  handleClickNext = async () => {
+
+    let body = {
+      organizationName: this.state.selectedOrganization,
+      projectsType: this.state.projectsType,
+      projectsSub: this.state.projectsSub,
+      page: this.state.page+1
+    }
+
+    console.log(body)
+    try {
+
+      let res = await axios.post('/projects', body);
+      console.log(res.data);
+      if(res.data.length === 0) {
+        alert('There is no next page');
+        return;
+      }
+      this.setState({
+        projects: res.data, 
+        searchBody: body, 
+        searchClicked: true, 
+        page: this.state.page+1
+      });
+      window.scrollTo(0, 0);
+
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
 
   async componentDidMount() {
 
@@ -149,6 +217,33 @@ class App extends React.Component {
           <div className='btn btn-primary' onClick={this.handleClickSearch}>Search</div>
 
         </form>
+        <br/>
+        <div style={{marginLeft: "20%", marginRight: "20%"}}>
+        {this.state.searchClicked ? (
+          <div>
+            <div>Page: {this.state.page}</div>
+            <div>Project count: {this.state.projects.length}</div>
+            <div>Projects:</div>
+          </div>
+        ) : ''}
+        {this.state.projects.map((e, i) => {
+          return (
+            <div key={e._id}>
+              <Project  element={e}/>
+              <br/>
+            </div>
+          )
+        })}
+
+        {this.state.searchClicked ? (<nav>
+          <ul className="pagination">
+            <li className="page-item" onClick={this.handleClickPrevous}><div className="page-link">Previous</div></li>
+            <li className="page-item" onClick={this.handleClickNext}><div className="page-link">Next</div></li>
+          </ul>
+        </nav>) : ''}
+
+        </div>
+
       </div>
     )
   }

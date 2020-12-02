@@ -21,4 +21,15 @@ const getOrganizations = async (query, paging) => {
     }
 };
 
-module.exports = {getOrganizations, getProjects};
+const getProjectsAggregation = async (query) => {
+    try{
+    
+        let res = await mongoDB.aggregate('projects', query);
+        return res;
+    }
+    catch(err) {
+        throw err;
+    }
+};
+
+module.exports = {getOrganizations, getProjects, getProjectsAggregation};
