@@ -19,9 +19,10 @@ class MongoDB {
         }
     }
 
-    async find(col, query) {
+    async find(col, query, paging) {
         try {
-            let res = await this.db.collection(col).find(query).toArray();
+            console.log(paging)
+            let res = await this.db.collection(col).find(query, paging).toArray();
             return res;
         }
         catch(err) {

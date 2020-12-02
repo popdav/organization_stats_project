@@ -30,4 +30,18 @@ router.get('/projects', async (req, res) => {
     }
 })
 
+router.post('/projects', async (req, res) => {
+    let body = req.body;
+    console.log(body);
+    try {
+        let proj = await getAllProjects(body);
+        res.send(proj)
+    } 
+    catch(err) {
+        console.log(err)
+        res.status(500).send('error')
+       
+    }
+})
+
 module.exports = router;
