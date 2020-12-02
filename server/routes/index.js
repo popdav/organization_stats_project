@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
-const {getAllOrganizations, getAllProjects, getAvgSmartTag} = require('../services/db_services');
+const {
+    getAllOrganizations, 
+    getAllProjects, 
+    getAvgSmartTag, 
+    getAvgProcessingTime, 
+    getProjectCountForEachScanner,
+    getTotalAreaScanned
+} = require('../services/db_services');
 
-router.get('/hello', (req, res) => {
-    res.send('Hello World!')
-})
+
 
 router.get('/organizations', async (req, res) => {
     try {
@@ -49,6 +54,51 @@ router.post('/smarttag', async (req, res) => {
     console.log(body);
     try {
         let avg = await getAvgSmartTag(body);
+        console.log(avg);
+        res.send(avg)
+    } 
+    catch(err) {
+        console.log(err)
+        res.status(500).send('error')
+       
+    }
+})
+
+router.post('/processingtime', async (req, res) => {
+    let body = req.body;
+    console.log(body);
+    try {
+        let avg = await getAvgProcessingTime(body);
+        console.log(avg);
+        res.send(avg)
+    } 
+    catch(err) {
+        console.log(err)
+        res.status(500).send('error')
+       
+    }
+})
+
+router.post('/projectcount', async (req, res) => {
+    let body = req.body;
+    console.log(body);
+    try {
+        let avg = await getProjectCountForEachScanner(body);
+        console.log(avg);
+        res.send(avg)
+    } 
+    catch(err) {
+        console.log(err)
+        res.status(500).send('error')
+       
+    }
+})
+
+router.post('/totalarea', async (req, res) => {
+    let body = req.body;
+    console.log(body);
+    try {
+        let avg = await getTotalAreaScanned(body);
         console.log(avg);
         res.send(avg)
     } 

@@ -8,6 +8,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      refreshRate: 1000*60,
       organizations: [],
       projects: [],
       selectedOrganization: '',
@@ -16,6 +17,46 @@ class App extends React.Component {
       page: 1,
       searchBody: {},
       searchClicked: false,
+      avgSmartTag: {},
+      processingTime: {},
+      projectCount: [],
+      totalArea: [],
+      inteval: null,
+      heartbeat: {live: false}
+    }
+  }
+
+  refresh = async () => {
+    try {
+
+      let res = await axios.post('/projects', this.state.searchBody);
+      console.log(res.data); 
+      let avg = await axios.post('/smarttag', this.state.searchBody);
+      console.log(avg)
+      let ptime = await axios.post('/processingtime', this.state.searchBody);
+      console.log(ptime)
+      let count = await axios.post('/projectcount', this.state.searchBody);
+      console.log(count)
+      let area = await axios.post('/totalarea', this.state.searchBody);
+      console.log(area)
+      
+      let heartbeat = await axios.get('/checkworker');
+      console.log(heartbeat);
+
+      this.setState({
+        projects: res.data,
+        searchClicked: true, 
+        page: 1,
+        avgSmartTag: avg.data[0],
+        processingTime: ptime.data[0],
+        projectCount: count.data,
+        totalArea: area.data,
+        heartbeat: heartbeat.data
+      });
+
+    }
+    catch(err) {
+      console.log(err);
     }
   }
 
@@ -35,6 +76,16 @@ class App extends React.Component {
     this.setState({projectsSub: body});
   };
 
+  handleClickRefresh = async () => {
+    if (this.state.inteval === null) {
+      alert('You need to search before refreshing');
+      return;
+    }
+    clearInterval(this.state.inteval);
+    await this.refresh();
+    this.setState({interval: setInterval(this.refresh, this.state.refreshRate)});
+  }
+
   handleClickSearch = async () => {
     
     let body = {
@@ -49,9 +100,29 @@ class App extends React.Component {
 
       let res = await axios.post('/projects', body);
       console.log(res.data); 
-      this.setState({projects: res.data, searchBody: body, searchClicked: true, page: 1})
       let avg = await axios.post('/smarttag', body);
       console.log(avg)
+      let ptime = await axios.post('/processingtime', body);
+      console.log(ptime)
+      let count = await axios.post('/projectcount', body);
+      console.log(count)
+      let area = await axios.post('/totalarea', body);
+      console.log(area)
+      let heartbeat = await axios.get('/checkworker');
+      console.log(heartbeat);
+
+      this.setState({
+        projects: res.data, 
+        searchBody: body, 
+        searchClicked: true, 
+        page: 1,
+        avgSmartTag: avg.data[0],
+        processingTime: ptime.data[0],
+        projectCount: count.data,
+        totalArea: area.data,
+        heartbeat: heartbeat.data,
+        inteval: setInterval(this.refresh, this.state.refreshRate),
+      });
 
     }
     catch(err) {
@@ -83,7 +154,7 @@ class App extends React.Component {
         searchClicked: true, 
         page: this.state.page-1
       });
-
+      window.scrollTo(0, 0);
     }
     catch(err) {
       console.log(err);
@@ -122,7 +193,7 @@ class App extends React.Component {
     }
   }
 
-  async componentDidMount() {
+    componentDidMount = async () => {
 
     try {
 
@@ -135,6 +206,11 @@ class App extends React.Component {
       console.log(err);
     }
 
+  }
+
+  componentWillUnmount = async () => {
+    clearInterval(this.state.inteval);
+    this.setState({interval: null});
   }
 
   render() {
@@ -213,19 +289,47 @@ class App extends React.Component {
               </label>
             </div>
           </div>
-
-          <div className='btn btn-primary' onClick={this.handleClickSearch}>Search</div>
-
+          <div className='d-flex justify-content-between'>
+            <div className='btn btn-primary' onClick={this.handleClickSearch}>Search</div>
+            <div className='btn btn-primary' onClick={this.handleClickRefresh}>Refresh</div>
+          </div>
         </form>
         <br/>
         <div style={{marginLeft: "20%", marginRight: "20%"}}>
+        {this.state.searchClicked && !this.state.heartbeat.live ? (
+          <div className="alert alert-danger" role="alert">
+            Worker is down!
+          </div>)
+          : ''
+          }
         {this.state.searchClicked ? (
-          <div>
+          <div className='card'>
             <div>Page: {this.state.page}</div>
             <div>Project count: {this.state.projects.length}</div>
-            <div>Projects:</div>
+            <div>Average count of smartTags per project: {this.state.avgSmartTag.avgSmartTag.toFixed(3)}</div>
+            <div>Average project processing time: {Math.floor(this.state.processingTime.avgProcessingTIme / 60000)} min {((this.state.processingTime.avgProcessingTIme % 60000) / 1000).toFixed(0)} sec</div>
+            <br />
+            <div>Project count for each scanner:</div>
+            <select multiple disabled className="form-control" id="exampleFormControlSelect2">
+              {this.state.projectCount.map((e, i) => {
+                return (
+                <option key={i}>scanner id: {e._id === null ? 'None' : e._id}, count: {e.count}</option>
+                )
+              })}
+            </select>
+            <br />
+            <div>Total area scanned by the organization:</div>
+            <select multiple disabled className="form-control" id="exampleFormControlSelect2">
+              {this.state.totalArea.map((e, i) => {
+                return (
+                <option key={i}>organization id: {e._id === null ? 'None' : e._id}, count: {e.count.toFixed(3)}</option>
+                )
+              })}
+            </select>
+            <br />
           </div>
         ) : ''}
+        <br />
         {this.state.projects.map((e, i) => {
           return (
             <div key={e._id}>

@@ -15,6 +15,7 @@ class MongoDB {
         catch(err) {
             console.log('MongoDB connection error:');
             console.log(err);
+            process.exit(1);
             return;
         }
     }

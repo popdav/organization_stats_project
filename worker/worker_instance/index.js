@@ -7,7 +7,10 @@ const socket = require('socket.io-client')('http://localhost:5005');
 
 connectToDB('mongodb://localhost:27017/insidemaps')
     .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.log('MongoDB error:', err))
+    .catch(err => {
+        console.log('MongoDB error:', err);
+        process.exit(1);
+    });
 
 socket.on('connect', () => {
     console.log('connected to server');

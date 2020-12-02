@@ -43,6 +43,78 @@ const getAvgSmartTag = async (body) => {
     }
 }
 
+const getAvgProcessingTime = async (body) => {
+    try {
+        let {query, paging} = buildQuery(body);
+        query.completed = true;
+        let avgQuery = [
+            {
+                $match: query,
+            },
+            {
+                $group:
+                    {
+                        _id: null,
+                        avgProcessingTIme: { $avg: {
+                            "$subtract": [
+                              { "$ifNull": [ "$completedAt", 0 ] },
+                              { "$ifNull": [ "$submittedAt", 0 ] }
+                            ]
+                          }}
+                    }
+            }
+          ]
+        return await getProjectsAggregation(avgQuery);
+    }
+    catch(err) {
+        throw err;
+    }
+}
+
+const getProjectCountForEachScanner = async (body) => {
+    try {
+        let {query, paging} = buildQuery(body);
+        let avgQuery = [
+            {
+                $match: query,
+            },
+            {
+                $group:
+                    {
+                        _id: "$scannerId",
+                        "count": { "$sum": 1 }
+                    }
+            }
+          ]
+        return await getProjectsAggregation(avgQuery);
+    }
+    catch(err) {
+        throw err;
+    }
+}
+
+const getTotalAreaScanned = async (body) => {
+    try {
+        let {query, paging} = buildQuery(body);
+        let avgQuery = [
+            {
+                $match: query,
+            },
+            {
+                $group:
+                    {
+                        _id: "$organizationId",
+                        "count": { "$sum": "$areaTotal" }
+                    }
+            }
+          ]
+        return await getProjectsAggregation(avgQuery);
+    }
+    catch(err) {
+        throw err;
+    }
+}
+
 const buildQuery = (body) => {
     let query = {};
     let paging = {};
@@ -74,4 +146,10 @@ const buildQuery = (body) => {
     return {query, paging};
 }
 
-module.exports = {getAllOrganizations, getAllProjects, getAvgSmartTag};
+module.exports = {
+    getAllOrganizations, 
+    getAllProjects, 
+    getAvgSmartTag, 
+    getAvgProcessingTime, 
+    getProjectCountForEachScanner, 
+    getTotalAreaScanned};
