@@ -1,0 +1,6 @@
+{
+    "mongoDB": "mongodb://localhost:27017",
+    "dbName": "insidemaps",
+    "worker": "http://localhost:5005",
+    "port": 3000
+}

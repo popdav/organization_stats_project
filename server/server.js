@@ -7,10 +7,13 @@ const app = express();
 const mongoDB = require('./db/connect');
 const indexRouter = require('./routes/index');
 const hearbeatRouter = require('./routes/heartbeat_routes');
-const port = 3000
+
+const url = require('./url.json')
+
+const port = url.port;
 
 
-mongoDB.connect('mongodb://localhost:27017', 'insidemaps');
+mongoDB.connect(url.mongoDB, url.dbName);
     
 
 const corsOptions = {

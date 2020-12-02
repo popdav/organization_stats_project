@@ -1,11 +1,11 @@
 const cron = require('node-cron');
-
+const url = require('../url.json');
 const {connectToDB} = require('../db/connect')
 const {getData} = require('../services/index')
 
-const socket = require('socket.io-client')('http://localhost:5005');
+const socket = require('socket.io-client')(url.worker);
 
-connectToDB('mongodb://localhost:27017/insidemaps')
+connectToDB(url.mongoDB + url.dbName)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => {
         console.log('MongoDB error:', err);
@@ -19,15 +19,15 @@ socket.on('connect', () => {
 
 socket.on('work', async (data) => {
     try {
-
-        cron.schedule('0 */5 * * * *', async () => {
+        await getData(data);
+        console.log("Got data!")
+        cron.schedule('0 */45 * * * *', async () => {
             await getData(data);
             console.log("Got data!")
         });
     }
     catch(err) {
         console.log(err);
-        throw err
     }
     
 });

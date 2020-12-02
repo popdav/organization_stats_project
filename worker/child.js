@@ -9,7 +9,7 @@ class Child {
         this.organizationIndex = 0;
         }
         catch(err) {
-            throw err;
+            console.log(err);
         }
     }
 

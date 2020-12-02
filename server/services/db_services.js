@@ -47,6 +47,7 @@ const getAvgProcessingTime = async (body) => {
     try {
         let {query, paging} = buildQuery(body);
         query.completed = true;
+        query.completedAt = { $exists: true }
         let avgQuery = [
             {
                 $match: query,
@@ -140,8 +141,17 @@ const buildQuery = (body) => {
         query['paid'] = false;
     }
 
+    const firstDay = new Date(body.year, body.month, 1);
+    const lastDay = new Date(body.year, body.month + 1, 0);
+
+    // query.updateAt = {
+    //     $lte: lastDay,
+    //     $gte: firstDay
+    // }
+
     paging.limit = limit;
     paging.skip = (body.page - 1) * limit;
+
 
     return {query, paging};
 }

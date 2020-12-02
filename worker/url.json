@@ -1,0 +1,8 @@
+{
+    "mongoDB": "mongodb://localhost:27017/",
+    "dbName": "insidemaps",
+    "worker": "http://localhost:5005",
+    "port": 5005,
+    "timeWaitChild": 60000,
+    "apiDelay": 2000
+}

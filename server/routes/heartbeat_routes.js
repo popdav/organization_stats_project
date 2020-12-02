@@ -1,4 +1,5 @@
-const socket = require('socket.io-client')('http://localhost:5005');
+const url = require('../url.json')
+const socket = require('socket.io-client')(url.worker);
 const express = require('express');
 const router = express.Router();
 

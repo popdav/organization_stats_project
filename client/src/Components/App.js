@@ -3,6 +3,8 @@ import '../../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css';
 import Project from './Project';
 import axios from 'axios';
+import MonthPickerInput  from 'react-month-picker-input';
+import 'react-month-picker-input/dist/react-month-picker-input.css';
 
 class App extends React.Component {
   constructor(props) {
@@ -22,7 +24,9 @@ class App extends React.Component {
       projectCount: [],
       totalArea: [],
       inteval: null,
-      heartbeat: {live: false}
+      heartbeat: {live: false},
+      monthVal: (new Date()).getMonth(), 
+      yearVal: (new Date()).getFullYear()
     }
   }
 
@@ -87,12 +91,14 @@ class App extends React.Component {
   }
 
   handleClickSearch = async () => {
-    
+    clearInterval(this.state.inteval);
     let body = {
       organizationName: this.state.selectedOrganization,
       projectsType: this.state.projectsType,
       projectsSub: this.state.projectsSub,
-      page: 1
+      page: 1,
+      year: this.state.yearVal,
+      month: this.state.monthVal
     }
 
     console.log(body)
@@ -213,6 +219,27 @@ class App extends React.Component {
     this.setState({interval: null});
   }
 
+  timeConversion = (millisec) => {
+
+      var seconds = (millisec / 1000).toFixed(1);
+
+      var minutes = (millisec / (1000 * 60)).toFixed(1);
+
+      var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
+
+      var days = (millisec / (1000 * 60 * 60 * 24)).toFixed(1);
+
+      if (seconds < 60) {
+          return seconds + " Sec";
+      } else if (minutes < 60) {
+          return minutes + " Min";
+      } else if (hours < 24) {
+          return hours + " Hrs";
+      } else {
+          return days + " Days"
+      }
+  }
+
   render() {
     return (
       <div className="container">
@@ -289,6 +316,16 @@ class App extends React.Component {
               </label>
             </div>
           </div>
+          <div className='form-group'>
+            <MonthPickerInput
+              year={this.state.yearVal}
+              month={this.state.monthVal}
+              onChange={(maskedValue, selectedYear, selectedMonth) => {
+                console.log(maskedValue, selectedYear, selectedMonth);
+                this.setState({yearVal: selectedYear, monthVal: selectedMonth});
+              }}
+            />
+          </div>
           <div className='d-flex justify-content-between'>
             <div className='btn btn-primary' onClick={this.handleClickSearch}>Search</div>
             <div className='btn btn-primary' onClick={this.handleClickRefresh}>Refresh</div>
@@ -305,9 +342,9 @@ class App extends React.Component {
         {this.state.searchClicked ? (
           <div className='card'>
             <div>Page: {this.state.page}</div>
-            <div>Project count: {this.state.projects.length}</div>
-            <div>Average count of smartTags per project: {this.state.avgSmartTag.avgSmartTag.toFixed(3)}</div>
-            <div>Average project processing time: {Math.floor(this.state.processingTime.avgProcessingTIme / 60000)} min {((this.state.processingTime.avgProcessingTIme % 60000) / 1000).toFixed(0)} sec</div>
+            <div>Project count per page: {this.state.projects.length}</div>
+            <div>Average count of smartTags per project: {this.state.avgSmartTag ? this.state.avgSmartTag.avgSmartTag.toFixed(3) : 0}</div>
+            <div>Average project processing time: {this.state.processingTime ? this.timeConversion(this.state.processingTime.avgProcessingTIme) : 0}</div>
             <br />
             <div>Project count for each scanner:</div>
             <select multiple disabled className="form-control" id="exampleFormControlSelect2">

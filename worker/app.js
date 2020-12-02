@@ -1,5 +1,6 @@
 const io = require('socket.io')();
-const Child = require('./child')
+const url = require('./url.json');
+const Child = require('./child');
 
 let config_path = './config.json'
 if(process.argv.length >= 3)
@@ -19,9 +20,9 @@ io.on('connection', client => {
 
 });
 
-io.listen(5005);
+io.listen(url.port);
 
-console.log('socket.io server working on: http://localhost:5005')
+console.log('socket.io server working on: http://localhost:'+url.port);
 
-setTimeout(cp.startChildProcess, 1000*60);
+setTimeout(cp.startChildProcess, url.timeWaitChild);
 
