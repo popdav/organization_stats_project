@@ -5,6 +5,6 @@ module.exports.Organization = mongoose.model(
     new mongoose.Schema({
         organizationId: String,
         organizationName: String,
-        projects: Array
+        projects: [{ type: String, ref: 'Project' }]
     }),
 );

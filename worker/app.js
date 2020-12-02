@@ -19,9 +19,9 @@ io.on('connection', client => {
 
 });
 
-io.listen(3000);
+io.listen(5005);
 
-console.log('socket.io server working on: http://localhost:3000')
+console.log('socket.io server working on: http://localhost:5005')
 
-setTimeout(cp.startChildProcess, 1000);
+setTimeout(cp.startChildProcess, 1000*60);
 

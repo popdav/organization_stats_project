@@ -4,7 +4,7 @@ module.exports.Project = mongoose.model(
     'Project',
     new mongoose.Schema({
         projectId: String,
-        organizationId: String,
+        organizationId: { type: String, ref: 'Organization' },
         name: String,
 		status: String,
 		package: String,

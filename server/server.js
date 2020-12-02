@@ -3,13 +3,13 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const logger = require('morgan');
 const app = express()
-const {connectToDB} = require('./db/connect')
+const mongoDB = require('./db/connect')
 const indexRouter = require('./routes/index');
-const port = 5005
+const port = 3000
 
-connectToDB('mongodb://localhost:27017/insidemaps')
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.log('MongoDB error:', err))
+
+mongoDB.connect('mongodb://localhost:27017', 'insidemaps');
+    
 
 const corsOptions = {
   origin: 'http://localhost',
