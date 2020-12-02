@@ -272,7 +272,7 @@ class App extends React.Component {
             </select>
           </div>
 
-          <div className='d-flex justify-content-between'>
+          {/* <div className='d-flex justify-content-between'>
             <div className='form-group'>
               <label>Select projects type:</label>
             </div>
@@ -330,7 +330,7 @@ class App extends React.Component {
                 Unpaid projects
               </label>
             </div>
-          </div>
+          </div> */}
           <div className='form-group'>
             <MonthPickerInput
               year={this.state.yearVal}
