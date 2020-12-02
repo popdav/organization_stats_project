@@ -30,6 +30,7 @@ const getAPIProjects = async (projects, token, organizationId) => {
     
     for (let i=0; i< projects.length; i++) {
         console.log('GET https://www.insidemaps.com/api/v2/projects/'  + projects[i]);
+        try {
         await delay(url.apiDelay, 1);
         let res = await axios.get('https://www.insidemaps.com/api/v2/projects/' + projects[i], {
                     headers: {
@@ -40,6 +41,10 @@ const getAPIProjects = async (projects, token, organizationId) => {
         res.projectId = projects[i];
         res.organizationId = organizationId;
         pushToDbProject(res);
+        }
+        catch(err) {
+            console.log(err);
+        }
     }
 }
 
